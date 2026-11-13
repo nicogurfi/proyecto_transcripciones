@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Evidence, PasoProtocolo } from "../api/schemas";
+import type { Evidence, FieldKey, PasoProtocolo } from "../api/schemas";
 import { CartaModal } from "../components/CartaModal";
 import { FichaView } from "../components/FichaView";
 import { LoadModal } from "../components/LoadModal";
@@ -12,6 +12,28 @@ import { isTyping } from "../util";
 interface Props {
   call: CallState;
   showHelp: () => void;
+}
+
+function pasosDesdeFicha(call: CallState): Partial<Record<number, Pick<PasoProtocolo, "estado" | "faltantes">>> {
+  const v = (k: FieldKey) => Boolean(call.valor(k));
+  const estado = (falt: number, total: number): EstadoPaso => (falt === 0 ? "completo" : falt < total ? "parcial" : "pendiente");
+  const f1: string[] = [];
+  if (!v("ubicacion.calle")) f1.push("Calle");
+  if (!(v("ubicacion.altura") || v("ubicacion.interseccion") || v("ubicacion.entre_calles"))) f1.push("Altura o esquina");
+  if (v("ubicacion.calle") && call.geo?.estado !== "validada") f1.push("Dirección no validada en callejero");
+  const e1: EstadoPaso = f1.length === 0 ? "completo" : v("ubicacion.calle") ? "parcial" : "pendiente";
+  const f2 = (
+    [["suceso.categoria", "Tipo de hecho"], ["suceso.descripcion", "Descripción"], ["prioridad", "Prioridad"]] as [FieldKey, string][]
+  ).filter(([k]) => !v(k)).map(([, n]) => n);
+  const f3: string[] = [];
+  if (!(v("personas.cantidad") || v("personas.victimas"))) f3.push("Personas involucradas");
+  if (!v("personas.estado")) f3.push("Estado de las personas");
+  const opcional = v("riesgos") ? [] : ["Riesgos en el lugar (si los hay)"];
+  return {
+    1: { estado: e1, faltantes: f1 },
+    2: { estado: estado(f2.length, 3), faltantes: f2 },
+    3: { estado: estado(f3.length, 2), faltantes: [...f3, ...opcional] },
+  };
 }
 
 export function Operacion({ call, showHelp }: Props) {
@@ -45,7 +67,11 @@ export function Operacion({ call, showHelp }: Props) {
     pasoOverrides[4] = critPend === 0 && critTotal > 0 ? "completo" : critPend < critTotal ? "parcial" : "pendiente";
     if (call.carta) pasoOverrides[6] = "completo";
   }
-  const pasos: PasoProtocolo[] = (a?.pasos.length ? a.pasos : DEFAULT_PASOS).map((p) => {
+  // Pasos 1-3 con los valores FINALES (correcciones del operador > sugerencia del copiloto),
+  // así el protocolo reacciona tanto a la transcripción como a las ediciones manuales.
+  const base13 = pasosDesdeFicha(call);
+  const pasos: PasoProtocolo[] = (a?.pasos.length ? a.pasos : DEFAULT_PASOS).map((p0) => {
+    const p = base13[p0.numero] && (a || call.turns.length) ? { ...p0, ...base13[p0.numero] } : p0;
     const tick = manualTicks[p.numero];
     const calc = pasoOverrides[p.numero] ?? p.estado;
     const estado: EstadoPaso = tick === true ? "completo" : tick === false && calc === "completo" ? "parcial" : calc;

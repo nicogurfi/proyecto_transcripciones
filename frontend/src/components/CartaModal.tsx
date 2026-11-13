@@ -79,7 +79,7 @@ export function CartaModal({ call, onClose }: Props) {
               <dt>Dirección</dt>
               <dd>
                 {direccion || "—"}{" "}
-                <span className={`geo-badge ${a?.geo.estado ?? "sin_datos"}`}>{a?.geo.estado === "validada" ? "validada" : "sin validar"}</span>
+                <span className={`geo-badge ${call.geo?.estado ?? "sin_datos"}`}>{call.geo?.estado === "validada" ? "validada" : "sin validar"}</span>
               </dd>
               <dt>Tipo</dt>
               <dd>{CATEGORIA_LABEL[v("suceso.categoria") ?? ""] ?? "—"} {v("suceso.subcategoria") ? `/ ${v("suceso.subcategoria")}` : ""}</dd>

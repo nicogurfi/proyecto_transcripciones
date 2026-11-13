@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  Analisis, Carta, CasoDetalle, CasosLista, Health, SimulacroCaso, SimulacroResultado, SimulacroStats,
+  Analisis, Carta, CasoDetalle, CasosLista, GeoValidacion, Health, SimulacroCaso, SimulacroResultado, SimulacroStats,
   type Turn,
 } from "./schemas";
 
@@ -29,6 +29,8 @@ export const api = {
   caso: (id: string) => getJson(`/api/casos/${encodeURIComponent(id)}`, CasoDetalle),
   parsear: (texto: string) => getJson("/api/parsear", z.object({ turnos: z.array(z.object({ speaker: z.enum(["operador", "llamante"]), text: z.string() })) }), json({ texto })),
   calles: (q: string) => getJson(`/api/calles?q=${encodeURIComponent(q)}`, z.array(z.string())),
+  validarDireccion: (body: { calle: string | null; altura: string | null; interseccion: string | null; entre_calles: string | null }) =>
+    getJson("/api/geo/validar", GeoValidacion, json(body)),
   derivar: (body: unknown) => getJson("/api/cartas", Carta, json(body)),
   cartas: () => getJson("/api/cartas", z.array(Carta)),
   correcciones: () => getJson("/api/correcciones", z.array(z.object({ campo: z.string(), n: z.number(), conf: z.number().nullable() }))),

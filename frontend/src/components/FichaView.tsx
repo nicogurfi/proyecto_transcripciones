@@ -133,7 +133,6 @@ function FieldRow({ k, call, onHover, big }: { k: FieldKey; call: CallState; onH
 }
 
 export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0 }: Props) {
-  const a = call.analisis;
   const refs = [useRef<HTMLElement>(null), useRef<HTMLElement>(null), useRef<HTMLElement>(null)];
   useEffect(() => {
     // solo al navegar a mano (scrollKey cambia): no mover la pantalla mientras llega el relato
@@ -143,7 +142,7 @@ export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0 }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollKey]);
   const act = (n: number) => (activeStep === n ? "active" : "");
-  const geo = a?.geo;
+  const geo = call.geo;
   const geoLabel: Record<string, string> = {
     validada: "Dirección validada",
     parcial: "Validación parcial",

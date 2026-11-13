@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from app.extraction.draft import Draft
-from app.geo.callejero import Tramo, display_name, get_callejero
+import re
+
+from app.extraction.draft import Direccion, Draft, Hallazgo
+from app.geo.callejero import Mencion, Tramo, display_name, get_callejero
 from app.geo.usig import get_usig
 from app.schemas import GeoValidacion
 
@@ -93,4 +95,39 @@ async def validar(draft: Draft, online: bool = True) -> GeoValidacion:
         geo.estado = "no_validada"
     else:
         geo.estado = "parcial"
+    return geo
+
+
+async def validar_valores(
+    calle: str | None, altura: str | None, interseccion: str | None, entre_calles: str | None
+) -> GeoValidacion:
+    """Revalida una dirección corregida a mano por el operador (sin transcripción)."""
+    cal = get_callejero()
+    draft = Draft()
+    if not calle or not calle.strip():
+        return GeoValidacion()
+    draft.campos["ubicacion.calle"] = Hallazgo(calle.strip(), [], "operador", 1.0, source="operador")
+    d = Direccion()
+    found = cal.lookup(calle)
+    alt = int(re.sub(r"\D", "", altura)) if altura and re.sub(r"\D", "", altura) else None
+    if found:
+        d.calle_tramos = list(found[1])
+    if alt is not None:
+        d.altura = alt
+        draft.campos["ubicacion.altura"] = Hallazgo(str(alt), [], "operador", 1.0, source="operador")
+    for texto, destino in ((interseccion, d.cruces), (entre_calles, d.entre)):
+        for nombre in re.split(r"\s+y\s+|,|/", texto or ""):
+            if not nombre.strip():
+                continue
+            hit = cal.lookup(nombre)
+            if hit:
+                destino.append(Mencion(0, 0, nombre.strip(), hit[0], list(hit[1]), hit[2], 100.0, False, None, 0, 0))
+    draft.direccion = d
+    geo = await validar(draft, online=True)
+    for texto in (interseccion, entre_calles):
+        for nombre in re.split(r"\s+y\s+|,|/", texto or ""):
+            if nombre.strip() and cal.lookup(nombre) is None:
+                geo.verificaciones.append(f"'{nombre.strip()}' no existe en el callejero")
+                geo.cruce_valido = False
+                geo.estado = "no_validada"
     return geo

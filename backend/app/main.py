@@ -12,6 +12,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from rapidfuzz import fuzz, process
 
 from app import carta as carta_service
@@ -19,6 +20,7 @@ from app import db, training
 from app.analysis.pipeline import analizar
 from app.config import DATA_DIR, get_settings
 from app.geo.callejero import display_name, get_callejero
+from app.geo.service import validar_valores
 from app.knowledge.catalog import DESCRIPCION_PRIORIDAD, get_retriever
 from app.knowledge.dataset import get_caso, load_dataset
 from app.knowledge.embeddings import get_embedder
@@ -28,6 +30,7 @@ from app.schemas import (
     AnalisisRequest,
     Carta,
     CartaRequest,
+    GeoValidacion,
     SimulacroCaso,
     SimulacroRespuesta,
     SimulacroResultado,
@@ -144,6 +147,19 @@ def autocompletar_calles(q: str = Query(min_length=2, max_length=60)) -> list[st
         if name not in out:
             out.append(name)
     return out[:8]
+
+
+class DireccionManual(BaseModel):
+    calle: str | None = None
+    altura: str | None = None
+    interseccion: str | None = None
+    entre_calles: str | None = None
+
+
+@app.post("/api/geo/validar", response_model=GeoValidacion)
+async def validar_direccion(d: DireccionManual) -> GeoValidacion:
+    """Revalidación de una dirección corregida por el operador."""
+    return await validar_valores(d.calle, d.altura, d.interseccion, d.entre_calles)
 
 
 @app.post("/api/cartas", response_model=Carta)

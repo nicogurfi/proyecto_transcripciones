@@ -44,3 +44,11 @@ def test_simulacro():
             "preguntas_pendientes": ["¿Hay gas?"], "instrucciones": "No reingresar", "tiempo_segundos": 40,
         }).json()
         assert 0 <= res["porcentaje"] <= 100 and res["items"]
+
+
+def test_revalidar_direccion_corregida_por_operador():
+    with TestClient(app) as client:
+        ok = client.post("/api/geo/validar", json={"calle": "Thames", "altura": "1900", "entre_calles": "Nicaragua y Costa Rica"}).json()
+        assert ok["estado"] == "validada"
+        mal = client.post("/api/geo/validar", json={"calle": "Thames", "altura": "4800", "interseccion": "Cabildo"}).json()
+        assert mal["estado"] == "no_validada" and mal["altura_en_rango"] is False and mal["cruce_valido"] is False
