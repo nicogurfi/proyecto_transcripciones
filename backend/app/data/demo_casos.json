@@ -1,0 +1,58 @@
+[
+  {
+    "id": "DEMO-01",
+    "titulo": "Médica · multi-turno con autocorrección del llamante",
+    "timestamp": "2026-11-13T21:10:00",
+    "origen": "TELEFONIA_911",
+    "turnos": [
+      {"speaker": "operador", "text": "911, ¿cuál es su emergencia?"},
+      {"speaker": "llamante", "text": "Hola, por favor, mi papá se descompuso, está tirado en el piso del baño y no me contesta."},
+      {"speaker": "operador", "text": "Tranquila, ya la ayudo. ¿Cuál es la dirección exacta?"},
+      {"speaker": "llamante", "text": "Avenida Rivadavia 4250, perdón, 4520, segundo B, entre Castro Barros y Río de Janeiro."},
+      {"speaker": "operador", "text": "¿Respira?"},
+      {"speaker": "llamante", "text": "Sí, respira pero raro, como roncando. Tiene 67 años y es diabético."},
+      {"speaker": "operador", "text": "¿Se golpeó la cabeza al caer?"},
+      {"speaker": "llamante", "text": "No sé, creo que se cayó contra el lavatorio. Mi teléfono es 11 5555 0101."}
+    ]
+  },
+  {
+    "id": "DEMO-02",
+    "titulo": "Incendio · transcripción ruidosa (ASR sin puntuación)",
+    "timestamp": "2026-11-13T14:32:00",
+    "origen": "TELEFONIA_911",
+    "turnos": [
+      {"speaker": "operador", "text": "911 emergencias, ¿dónde es su urgencia?"},
+      {"speaker": "llamante", "text": "si hola hay mucho humo negro saliendo de un departamento en escalabrini ortis al 1300 casi gorriti piso 4 no sé si hay alguien adentro la vecina no contesta el timbre"}
+    ]
+  },
+  {
+    "id": "DEMO-03",
+    "titulo": "Vial · dirección imposible (altura y esquina inválidas)",
+    "timestamp": "2026-11-13T18:05:00",
+    "origen": "TELEFONIA_911",
+    "turnos": [
+      {"speaker": "operador", "text": "911, ¿cuál es su emergencia?"},
+      {"speaker": "llamante", "text": "Se cayó un motociclista acá en Thames 4800 y Cabildo. Tiene el casco puesto, está consciente pero sangrando mucho de la pierna y los autos siguen pasando al lado."}
+    ]
+  },
+  {
+    "id": "DEMO-04",
+    "titulo": "Defensa Civil · gas con saludo incoherente a la hora",
+    "timestamp": "2026-11-14T03:10:00",
+    "origen": "TELEFONIA_103",
+    "turnos": [
+      {"speaker": "operador", "text": "103 Guardia de Auxilio."},
+      {"speaker": "llamante", "text": "Buen día, en Av. Boedo 950 entre Carlos Calvo y Estados Unidos hay un olor a gas muy fuerte en todo el edificio y una vecina del primer piso se desmayó en el pasillo."}
+    ]
+  },
+  {
+    "id": "DEMO-05",
+    "titulo": "Seguridad · ubicación imprecisa y datos inciertos",
+    "timestamp": "2026-11-14T01:40:00",
+    "origen": "TELEFONIA_911",
+    "turnos": [
+      {"speaker": "operador", "text": "911, ¿su emergencia?"},
+      {"speaker": "llamante", "text": "Están peleando en la puerta de un bar sobre Avenida de Mayo, son como cinco o seis pibes y creo que uno tiene un cuchillo. Hay un chico en el piso que no se mueve."}
+    ]
+  }
+]
