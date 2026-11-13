@@ -1,0 +1,245 @@
+{
+ "CORRIENTES 1540": {
+  "direccion": "CORRIENTES AV. 1540, CABA",
+  "lat": -34.604241,
+  "lon": -58.388642,
+  "barrio": "San Nicolas",
+  "comuna": "Comuna 1",
+  "comisaria_vecinal": "1B",
+  "fuente": "cache"
+ },
+ "RAUL SCALABRINI ORTIZ 800": {
+  "direccion": "SCALABRINI ORTIZ, RAUL AV. 800, CABA",
+  "lat": -34.596443,
+  "lon": -58.433579,
+  "barrio": "Villa Crespo",
+  "comuna": "Comuna 15",
+  "comisaria_vecinal": "15B",
+  "fuente": "cache"
+ },
+ "BILLINGHURST 1845": {
+  "direccion": "BILLINGHURST 1845, CABA",
+  "lat": -34.58918,
+  "lon": -58.409133,
+  "barrio": "Recoleta",
+  "comuna": "Comuna 2",
+  "comisaria_vecinal": "2B",
+  "fuente": "cache"
+ },
+ "ESCALADA Y CASTAÑARES": {
+  "direccion": "ESCALADA AV. y CASTAÑARES AV., CABA",
+  "lat": -34.664989,
+  "lon": -58.469389,
+  "barrio": null,
+  "comuna": null,
+  "comisaria_vecinal": null,
+  "fuente": "cache"
+ },
+ "SAN JUAN Y ENTRE RIOS": {
+  "direccion": "SAN JUAN AV. y ENTRE RIOS AV., CABA",
+  "lat": -34.622731,
+  "lon": -58.391495,
+  "barrio": null,
+  "comuna": null,
+  "comisaria_vecinal": null,
+  "fuente": "cache"
+ },
+ "DIRECTORIO 2140": {
+  "direccion": "DIRECTORIO AV. 2140, CABA",
+  "lat": -34.632447,
+  "lon": -58.4571,
+  "barrio": "Flores",
+  "comuna": "Comuna 7",
+  "comisaria_vecinal": "7A",
+  "fuente": "cache"
+ },
+ "CABILDO 3700": {
+  "direccion": "CABILDO AV. 3700, CABA",
+  "lat": -34.549088,
+  "lon": -58.468255,
+  "barrio": "Nuñez",
+  "comuna": "Comuna 13",
+  "comisaria_vecinal": "13B",
+  "fuente": "cache"
+ },
+ "FOREST 1200": {
+  "direccion": "FOREST AV. 1200, CABA",
+  "lat": -34.578417,
+  "lon": -58.460234,
+  "barrio": "Chacarita",
+  "comuna": "Comuna 15",
+  "comisaria_vecinal": "15A",
+  "fuente": "cache"
+ },
+ "THAMES 1900": {
+  "direccion": "THAMES 1900, CABA",
+  "lat": -34.586,
+  "lon": -58.428125,
+  "barrio": "Palermo",
+  "comuna": "Comuna 14",
+  "comisaria_vecinal": "14A",
+  "fuente": "cache"
+ },
+ "JUAN B JUSTO Y MUÑECAS": {
+  "direccion": "JUSTO, JUAN B. AV. y MUÑECAS, CABA",
+  "lat": -34.597852,
+  "lon": -58.448775,
+  "barrio": null,
+  "comuna": null,
+  "comisaria_vecinal": null,
+  "fuente": "cache"
+ },
+ "RIVADAVIA 6300": {
+  "direccion": "RIVADAVIA AV. 6300, CABA",
+  "lat": -34.626178,
+  "lon": -58.455217,
+  "barrio": "Flores",
+  "comuna": "Comuna 7",
+  "comisaria_vecinal": "7C",
+  "fuente": "cache"
+ },
+ "SERRANO Y HONDURAS": {
+  "direccion": "SERRANO y HONDURAS, CABA",
+  "lat": -34.588628,
+  "lon": -58.430327,
+  "barrio": null,
+  "comuna": null,
+  "comisaria_vecinal": null,
+  "fuente": "cache"
+ },
+ "SARMIENTO Y BULNES": {
+  "direccion": "SARMIENTO y BULNES, CABA",
+  "lat": -34.60528,
+  "lon": -58.418358,
+  "barrio": null,
+  "comuna": null,
+  "comisaria_vecinal": null,
+  "fuente": "cache"
+ },
+ "YERBAL 2450": {
+  "direccion": "YERBAL 2450, CABA",
+  "lat": -34.627963,
+  "lon": -58.464195,
+  "barrio": "Flores",
+  "comuna": "Comuna 7",
+  "comisaria_vecinal": "7C",
+  "fuente": "cache"
+ },
+ "BILLINGHURST Y GORRITI": {
+  "direccion": "BILLINGHURST y GORRITI, CABA",
+  "lat": -34.595605,
+  "lon": -58.413834,
+  "barrio": null,
+  "comuna": null,
+  "comisaria_vecinal": null,
+  "fuente": "cache"
+ },
+ "HONDURAS 4800": {
+  "direccion": "HONDURAS 4800, CABA",
+  "lat": -34.590127,
+  "lon": -58.428139,
+  "barrio": "Palermo",
+  "comuna": "Comuna 14",
+  "comisaria_vecinal": "14A",
+  "fuente": "cache"
+ },
+ "WARNES 650": {
+  "direccion": "WARNES AV. 650, CABA",
+  "lat": -34.601171,
+  "lon": -58.445482,
+  "barrio": "Villa Crespo",
+  "comuna": "Comuna 15",
+  "comisaria_vecinal": "15B",
+  "fuente": "cache"
+ },
+ "27 DE FEBRERO Y PUENTE ALSINA": {
+  "direccion": "27 DE FEBRERO AV. y PUENTE ALSINA, CABA",
+  "lat": -34.65896,
+  "lon": -58.41645,
+  "barrio": null,
+  "comuna": null,
+  "comisaria_vecinal": null,
+  "fuente": "cache"
+ },
+ "BELGRANO 3100": {
+  "direccion": "BELGRANO AV. 3100, CABA",
+  "lat": -34.615314,
+  "lon": -58.40956,
+  "barrio": "Balvanera",
+  "comuna": "Comuna 3",
+  "comisaria_vecinal": "3A",
+  "fuente": "cache"
+ },
+ "WARNES 1400": {
+  "direccion": "WARNES AV. 1400, CABA",
+  "lat": -34.597935,
+  "lon": -58.455449,
+  "barrio": "Villa Crespo",
+  "comuna": "Comuna 15",
+  "comisaria_vecinal": "15A",
+  "fuente": "cache"
+ },
+ "SAN JUAN 2800": {
+  "direccion": "SAN JUAN AV. 2800, CABA",
+  "lat": -34.624006,
+  "lon": -58.403355,
+  "barrio": "San Cristobal",
+  "comuna": "Comuna 3",
+  "comisaria_vecinal": "3B",
+  "fuente": "cache"
+ },
+ "PARAGUAY 3800": {
+  "direccion": "PARAGUAY 3800, CABA",
+  "lat": -34.590497,
+  "lon": -58.416846,
+  "barrio": "Palermo",
+  "comuna": "Comuna 14",
+  "comisaria_vecinal": "14A",
+  "fuente": "cache"
+ },
+ "MANUEL MONTES DE OCA 1100": {
+  "direccion": "MONTES DE OCA, MANUEL AV. 1100, CABA",
+  "lat": -34.640464,
+  "lon": -58.374155,
+  "barrio": "Barracas",
+  "comuna": "Comuna 4",
+  "comisaria_vecinal": "4D",
+  "fuente": "cache"
+ },
+ "INDEPENDENCIA 2200": {
+  "direccion": "INDEPENDENCIA AV. 2200, CABA",
+  "lat": -34.618459,
+  "lon": -58.397499,
+  "barrio": "Balvanera",
+  "comuna": "Comuna 3",
+  "comisaria_vecinal": "3B",
+  "fuente": "cache"
+ },
+ "RIVADAVIA 4520": {
+  "direccion": "RIVADAVIA AV. 4520, CABA",
+  "lat": -34.615407,
+  "lon": -58.429735,
+  "barrio": "Caballito",
+  "comuna": "Comuna 6",
+  "comisaria_vecinal": "5A",
+  "fuente": "cache"
+ },
+ "RAUL SCALABRINI ORTIZ 1300": {
+  "direccion": "SCALABRINI ORTIZ, RAUL AV. 1300, CABA",
+  "lat": -34.593015,
+  "lon": -58.428296,
+  "barrio": "Palermo",
+  "comuna": "Comuna 14",
+  "comisaria_vecinal": "14A",
+  "fuente": "cache"
+ },
+ "BOEDO 950": {
+  "direccion": "BOEDO AV. 950, CABA",
+  "lat": -34.624944,
+  "lon": -58.416045,
+  "barrio": "Boedo",
+  "comuna": "Comuna 5",
+  "comisaria_vecinal": "5B",
+  "fuente": "cache"
+ }
+}
