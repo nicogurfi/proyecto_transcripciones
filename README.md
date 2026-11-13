@@ -67,8 +67,18 @@ Si el LLM falla, tarda más de `LLM_TIMEOUT_SECONDS` o devuelve JSON inválido, 
    | `F3` / `Alt+3` | Casos similares y recursos (referencia para el despachador) |
    | `F4` / `Alt+4` | Posibles inconsistencias (errores del llamante o de la transcripción) |
 
-5. **`Ctrl+Enter`** abre la revisión final y vuelve a apretarse para **derivar la carta**.
-6. Pestañas **Simulacro** (entrenamiento sin copiloto) y **Cartas** (historial y correcciones registradas).
+5. **Protocolo por pasos.** Por defecto el copiloto se para en el primer paso sin tildar (modo AUTO), pero el operador se mueve libremente:
+
+   | Tecla | Acción |
+   |---|---|
+   | `Alt+↑` / `Alt+↓` (o `RePág` / `AvPág`) | Paso anterior / siguiente |
+   | `Alt+Shift+1…6` o click en el paso | Ir directo a un paso (modo MANUAL) |
+   | `Alt+T` o click en el círculo | Tildar / destildar el paso actual |
+   | `Alt+0` | Volver al modo automático |
+
+   Ir al paso 4 abre las preguntas (F1) y el paso 5 las instrucciones (F2); los pasos 1–3 resaltan la sección de la ficha.
+6. **`Ctrl+Enter`** abre la revisión final y vuelve a apretarse para **derivar la carta**.
+7. Pestañas **Simulacro** (entrenamiento sin copiloto) y **Cartas** (historial y correcciones registradas).
 
 Con `Alt+N` se escribe un nuevo turno de diálogo y se vuelve a analizar. Con `?` se ven todos los atajos.
 
