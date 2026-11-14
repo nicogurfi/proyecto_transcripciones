@@ -167,6 +167,12 @@ def derivar_carta(req: CartaRequest) -> Carta:
     return carta_service.derivar(req)
 
 
+@app.post("/api/cartas/previsualizar", response_model=Carta)
+def previsualizar_carta(req: CartaRequest) -> Carta:
+    """Borrador de la carta con los valores finales (no se guarda)."""
+    return carta_service.armar(req, persistir=False)
+
+
 @app.get("/api/cartas")
 def listar_cartas() -> list[dict[str, Any]]:
     return db.list_cartas()

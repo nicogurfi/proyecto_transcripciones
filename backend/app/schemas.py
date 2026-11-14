@@ -154,6 +154,12 @@ class CasoSimilar(StrictModel):
     recursos: str
 
 
+class RecursoSugerido(StrictModel):
+    texto: str
+    fuente: str  # "catálogo SFX-..." | "regla"
+    motivo: str
+
+
 class Inconsistencia(StrictModel):
     id: str
     tipo: str
@@ -178,6 +184,8 @@ class Analisis(StrictModel):
     alertas_criticas: list[AlertaCritica]
     casos_similares: list[CasoSimilar]
     inconsistencias: list[Inconsistencia]
+    recursos_sugeridos: list[RecursoSugerido] = Field(default_factory=list)
+    nota_operativa: str = ""
     notas: list[str] = Field(default_factory=list)
 
 
@@ -210,6 +218,7 @@ class CartaRequest(StrictModel):
     recursos_sugeridos: list[str] = Field(default_factory=list)
     geo: GeoValidacion | None = None
     notas_operador: str | None = Field(default=None, max_length=2000)
+    nota_operativa: str | None = Field(default=None, max_length=2000)  # si el operador la editó
     origen: str = "TELEFONIA_911"
     caso_ref: str | None = None
     timestamp_llamada: str | None = None
@@ -234,6 +243,8 @@ class Carta(StrictModel):
     barrio: str | None
     comisaria_vecinal: str | None
     resumen: str
+    nota_operativa: str
+    recursos_detalle: list[RecursoSugerido]
     personas: str | None
     riesgos: str | None
     preguntas_respondidas: list[str]

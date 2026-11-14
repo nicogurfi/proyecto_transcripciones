@@ -14,7 +14,8 @@ El operador **no despacha**: contiene al llamante, extrae y valida datos, transm
 - **P4 no existe en el dataset** (solo P1–P3). Lo definí como "No urgente / informativo" (reclamos, hechos de hace días).
 - **P1 exige evidencia explícita** de riesgo de vida: atrapados, sin respuesta, compromiso respiratorio, fuego activo, gas, etc. Si los casos parecidos sugieren P1 pero el relato no tiene ninguna señal, propongo P2 con confianza baja y lo marco como inconsistencia para verificar. Ante discrepancia entre reglas y LLM, **se toma la prioridad más grave**.
 - **La llamada evoluciona.** Para datos que cambian (estado de las personas, atrapamiento), el valor actual es **el último dicho** y el anterior queda como historial: "está bien (antes: se desmayó)". El cambio se informa en F4 para confirmarlo. Si una señal de riesgo de vida parece resolverse ("ya reaccionó", "ya salió"), **la prioridad no baja sola**: se mantiene la más grave, baja la confianza y se pide al operador que evalúe. Bajar un P1 por una frase mal interpretada es el error más caro.
-- **Recursos de despacho**: se muestran solo como referencia, y aclarando que la decisión es del despachador CAD.
+- **Recursos de despacho**: son una referencia para el despachador CAD, que es quien decide. Se copian del catálogo **solo si el caso es equivalente** (similitud ≥ 0,75). Si no, se sugieren organismos a notificar con reglas auditables: categoría → SAME, Bomberos, Tránsito o Policía; riesgos → Rescate si hay atrapados, Metrogas si hay gas, Edesur/Edenor si hay cables, AySA si hay agua. Antes se copiaban los recursos del caso más parecido aunque no se pareciera, lo que producía errores como sugerir "ambulancia con anticonvulsivantes" para una persona descompuesta.
+- **Nota operativa de la carta**: se arma con una plantilla **solo con datos de la ficha** (qué pasó · dónde · personas y estado · riesgos · alertas), ya validados por evidencia o por el operador. No usa LLM, así que no puede inventar. El operador la ve y puede editarla en la revisión final. Un subtipo "orientativo" no validado no entra ni en la nota ni en la carta.
 - **El número de rellamada** no está en las transcripciones. Queda como pregunta base del checklist (en un sistema real lo aporta el ANI).
 
 ### Observaciones sobre el dataset
@@ -41,6 +42,8 @@ El operador **no despacha**: contiene al llamante, extrae y valida datos, transm
 | LLM lento o caído | `asyncio.wait_for` con timeout. La fase rápida ya está en pantalla. |
 | Confianza "autodeclarada" | No se le pide el % al LLM. La confianza **se calcula**: método de extracción, coincidencia en el callejero, acuerdo entre reglas y LLM, dudas del llamante en el mismo fragmento, y altura o cruce inválidos. |
 | Dirección inexistente | Validación offline contra el callejero oficial (existencia, rango de altura, que las calles se crucen) y doble chequeo online con USIG. |
+
+**El modo simulado no infla la confianza.** El mock repite lo que dicen las reglas, así que "coincidir" con ellas no es evidencia independiente: su salida se valida, pero no se fusiona ni sube la confianza.
 
 **Patrón dual provider.** `LLMProvider` tiene tres implementaciones: `MockProvider`, `AnthropicProvider` y `OpenAICompatibleProvider` (este último cubre OpenAI, Groq, Gemini, Ollama y vLLM). El mock devuelve **el mismo esquema JSON que un LLM**, construido con las reglas. Así, en modo offline se ejercita el pipeline completo (parseo, validación, verificación y fusión), no un atajo.
 

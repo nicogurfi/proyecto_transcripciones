@@ -34,3 +34,8 @@ def test_split_sentences_offsets():
     text = "Hola. Se prendió fuego! Vengan."
     for s, a, b in split_sentences(text):
         assert text[a:b] == s
+
+
+def test_split_sentences_no_corta_en_abreviaturas():
+    sents = [s for s, _, _ in split_sentences("Chocó un taxi en Av. San Juan y Entre Ríos. El delivery no se mueve.")]
+    assert sents == ["Chocó un taxi en Av. San Juan y Entre Ríos.", "El delivery no se mueve."]

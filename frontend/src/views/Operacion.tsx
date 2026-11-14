@@ -100,7 +100,6 @@ export function Operacion({ call, showHelp }: Props) {
         return next;
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [pasosKey],
   );
 

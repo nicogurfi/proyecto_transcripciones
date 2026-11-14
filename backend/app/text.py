@@ -123,15 +123,25 @@ def word_to_int(word: str) -> int | None:
 _SENT_RE = re.compile(r"[^.!?¡¿]+[.!?]*")
 
 
+_ABREVIATURAS = re.compile(r"\b(?:av|avda|dr|dra|gral|sr|sra|srta|cnel|pte|ing|n|nro|dto|depto|esq|km)\.$", re.I)
+
+
 def split_sentences(text: str, offset: int = 0) -> list[tuple[str, int, int]]:
-    """Divide en oraciones devolviendo (texto, start, end) con offsets absolutos."""
+    """Divide en oraciones devolviendo (texto, start, end) con offsets absolutos.
+    No corta después de abreviaturas ("Av. San Juan", "Dr. Rivera")."""
     out: list[tuple[str, int, int]] = []
+    chunks: list[tuple[str, int]] = []
     for m in _SENT_RE.finditer(text):
-        chunk = m.group(0)
+        if chunks and _ABREVIATURAS.search(chunks[-1][0].rstrip()):
+            _, start = chunks[-1]
+            chunks[-1] = (text[start : m.end()], start)
+        else:
+            chunks.append((m.group(0), m.start()))
+    for chunk, chunk_start in chunks:
         stripped = chunk.strip(" ,;")
         if len(stripped) < 3:
             continue
         lead = len(chunk) - len(chunk.lstrip(" ,;"))
-        start = offset + m.start() + lead
+        start = offset + chunk_start + lead
         out.append((stripped, start, start + len(stripped)))
     return out

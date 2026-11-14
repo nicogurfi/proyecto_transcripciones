@@ -16,7 +16,7 @@ from collections.abc import AsyncIterator
 
 from pydantic import ValidationError
 
-from app.analysis import inconsistencies, protocol, safety
+from app.analysis import dispatch, inconsistencies, protocol, safety
 from app.config import get_settings
 from app.extraction import llm as llm_ext
 from app.extraction.draft import FIELD_KEYS, Draft, Hallazgo
@@ -66,6 +66,10 @@ def merge(rules: Draft, llm_campos: dict[str, Hallazgo], notas: list[str]) -> Dr
             continue
         if r is None:
             merged.campos[key] = m
+            continue
+        if r.method.startswith("orientativa"):
+            # subtipo de parecido bajo: que el LLM lo repita no lo vuelve confiable
+            merged.campos[key] = m if m.confidence > r.confidence and not _same(r.value, m.value) else r
             continue
         if _same(r.value, m.value):
             r2 = copy.copy(r)
@@ -163,6 +167,11 @@ def build(
         if llm_answers and item.id in llm_answers and item.estado == "pendiente":
             item.estado, item.confianza, item.evidencia = "respondida_sugerida", 0.7, llm_answers[item.id]
     pasos, sugerido = protocol.build_pasos(draft, geo, checklist, len(instr))
+    # El subtipo "orientativo" (parecido bajo) no va a la nota: sería afirmar algo no sustentado.
+    valores = {k: h.value for k, h in draft.campos.items() if not h.method.startswith("orientativa")}
+    if geo.barrio and not valores.get("ubicacion.barrio"):
+        valores["ubicacion.barrio"] = geo.barrio.title()
+    alertas_txt = [x.texto for x in alertas]
     return Analisis(
         fase=fase,  # type: ignore[arg-type]
         proveedor=provider.name,
@@ -178,6 +187,8 @@ def build(
         alertas_criticas=alertas,
         casos_similares=_similares(draft),
         inconsistencias=inconsistencies.detectar(doc, draft, geo, req.timestamp, llm_incs),
+        recursos_sugeridos=dispatch.recursos_sugeridos(valores, draft.similares, geo, doc.caller_text),
+        nota_operativa=dispatch.nota_operativa(valores, geo, alertas_txt),
         notas=notas,
     )
 
@@ -204,6 +215,10 @@ async def _llm_phase(doc: Document, draft: Draft, notas: list[str]) -> tuple[Dra
         notas.append("Se descartó la salida del modelo: se usan las reglas.")
         return draft, {}, []
     llm_campos = llm_ext.to_campos(ext, doc, notas)
+    if provider.is_mock:
+        # El mock repite las reglas: "coincidir" con ellas no es evidencia independiente,
+        # así que no se fusiona (no se infla la confianza). El parseo/validación sí se ejercitó.
+        return draft, {}, []
     merged = merge(draft, llm_campos, notas)
     if "ubicacion.calle" in llm_campos:
         llm_ext.address_from_llm(merged, merged.campos)

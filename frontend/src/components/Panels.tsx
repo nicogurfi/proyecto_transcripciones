@@ -137,6 +137,18 @@ export function SidePanel({ panel, call, onClose, onHover }: Props) {
       {a && panel === "similares" && (
         <div className="panel-body">
           <p className="panel-note warn">Los recursos son una referencia para el despachador CAD: el operador no decide el despacho.</p>
+          <h3 className="panel-sub">Recursos sugeridos</h3>
+          <ul className="items">
+            {a.recursos_sugeridos.map((r) => (
+              <li key={r.texto}>
+                <div>
+                  <p>{r.texto}</p>
+                  <span className="tag">{r.fuente === "regla" ? "regla" : r.fuente} · {r.motivo}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <h3 className="panel-sub">Casos parecidos del catálogo</h3>
           {a.casos_similares.map((c) => (
             <article key={c.id} className="similar">
               <header>
@@ -145,7 +157,7 @@ export function SidePanel({ panel, call, onClose, onHover }: Props) {
               </header>
               <div className="sim-bar"><span style={{ width: pct(Math.max(0, c.similitud)) }} /></div>
               <p className="muted">{c.id} · {CATEGORIA_LABEL[c.categoria] ?? c.categoria} · similitud {pct(c.similitud)}</p>
-              <p><b>Recursos:</b> {c.recursos}</p>
+              {c.similitud < 0.75 && <p className="tag warn">Parecido bajo: solo como referencia, no se usan sus recursos.</p>}
               <p className="muted">{c.nota_despacho}</p>
             </article>
           ))}

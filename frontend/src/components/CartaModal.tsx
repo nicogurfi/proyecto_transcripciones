@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { Carta } from "../api/schemas";
 import type { CallState } from "../state/useCall";
 import { CATEGORIA_LABEL } from "../util";
 
@@ -9,6 +10,9 @@ interface Props {
 
 export function CartaModal({ call, onClose }: Props) {
   const [notas, setNotas] = useState("");
+  const [borrador, setBorrador] = useState<Carta | null>(null);
+  const [nota, setNota] = useState("");
+  const [notaEditada, setNotaEditada] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const a = call.analisis;
@@ -22,11 +26,24 @@ export function CartaModal({ call, onClose }: Props) {
   if (!v("prioridad")) faltan.push("prioridad");
   const pendCrit = call.pendientes.filter((p) => p.critica);
 
+  // Borrador con los valores finales: nota operativa sugerida (editable) y recursos de referencia
+  useEffect(() => {
+    if (call.carta) return;
+    call
+      .previsualizar()
+      .then((b) => {
+        if (!b) return;
+        setBorrador(b);
+        setNota(b.nota_operativa);
+      })
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
+  }, []);
+
   const send = async () => {
     setSending(true);
     setError(null);
     try {
-      await call.derivar(notas);
+      await call.derivar(notas, notaEditada ? nota : null);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -83,8 +100,6 @@ export function CartaModal({ call, onClose }: Props) {
               </dd>
               <dt>Tipo</dt>
               <dd>{CATEGORIA_LABEL[v("suceso.categoria") ?? ""] ?? "—"} {v("suceso.subcategoria") ? `/ ${v("suceso.subcategoria")}` : ""}</dd>
-              <dt>Relato</dt>
-              <dd>{v("suceso.descripcion") ?? "—"}</dd>
               <dt>Personas</dt>
               <dd>{[v("personas.cantidad"), v("personas.victimas"), v("personas.estado")].filter(Boolean).join(" · ") || "—"}</dd>
               <dt>Riesgos</dt>
@@ -98,7 +113,31 @@ export function CartaModal({ call, onClose }: Props) {
                 {pendCrit.length > 0 && <p>{pendCrit.length} preguntas críticas sin realizar (F1).</p>}
               </div>
             )}
-            <textarea placeholder="Notas para el despachador (opcional)" value={notas} onChange={(e) => setNotas(e.target.value)} rows={2} />
+            <label className="nota-op">
+              <span>Nota operativa para despacho <em>(armada solo con datos de la ficha · editable)</em></span>
+              <textarea
+                value={nota}
+                rows={3}
+                placeholder="Generando…"
+                onChange={(e) => {
+                  setNota(e.target.value);
+                  setNotaEditada(true);
+                }}
+              />
+            </label>
+            {borrador && borrador.recursos_detalle.length > 0 && (
+              <div className="recursos-box">
+                <span>Recursos sugeridos · referencia, decide el despachador</span>
+                <ul>
+                  {borrador.recursos_detalle.map((r) => (
+                    <li key={r.texto}>
+                      {r.texto} <em>· {r.motivo}</em>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <textarea placeholder="Notas adicionales del operador (opcional)" value={notas} onChange={(e) => setNotas(e.target.value)} rows={2} />
             {error && <p className="error">{error}</p>}
             <footer className="modal-f">
               <button type="button" className="ghost" onClick={onClose}>Volver (Esc)</button>

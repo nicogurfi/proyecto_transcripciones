@@ -54,3 +54,9 @@ def test_fusion_prioridad_toma_la_mas_grave():
     merged = merge(rules, llm, [])
     assert merged.campos["prioridad"].value == "P1"
     assert merged.campos["prioridad"].alternatives == ["P3"]
+
+
+def test_subtipo_orientativo_no_sube_por_coincidencia():
+    rules = Draft(campos={"suceso.subcategoria": Hallazgo("Convulsión", [], "orientativa: caso X (sim 0.50)", 0.3, source="inferido")})
+    llm = {"suceso.subcategoria": Hallazgo("Convulsión", [], "LLM", 0.65, source="inferido")}
+    assert merge(rules, llm, []).campos["suceso.subcategoria"].confidence == 0.3

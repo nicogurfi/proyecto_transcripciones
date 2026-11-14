@@ -5,7 +5,8 @@ from __future__ import annotations
 from datetime import datetime
 
 from app import db
-from app.knowledge.catalog import DESCRIPCION_PRIORIDAD
+from app.analysis import dispatch
+from app.knowledge.catalog import DESCRIPCION_PRIORIDAD, get_retriever
 from app.schemas import Carta, CartaRequest
 from app.text import norm
 
@@ -15,27 +16,16 @@ def _v(req: CartaRequest, key: str) -> str | None:
     return val.strip() if isinstance(val, str) and val.strip() else None
 
 
-def componer_direccion(req: CartaRequest) -> str:
-    calle, altura = _v(req, "ubicacion.calle"), _v(req, "ubicacion.altura")
-    partes: list[str] = []
-    if calle:
-        partes.append(f"{calle} {altura}" if altura else calle)
-    if piso := _v(req, "ubicacion.piso_depto"):
-        partes.append(piso)
-    if inter := _v(req, "ubicacion.interseccion"):
-        partes.append(f"esq. {inter}")
-    if entre := _v(req, "ubicacion.entre_calles"):
-        partes.append(f"entre {entre}")
-    if ref := _v(req, "ubicacion.referencia"):
-        partes.append(f"({ref})")
-    if barrio := _v(req, "ubicacion.barrio"):
-        partes.append(f"– {barrio}")
-    return ", ".join(partes) if partes else "SIN DIRECCIÓN"
-
-
-def derivar(req: CartaRequest) -> Carta:
+def armar(req: CartaRequest, persistir: bool) -> Carta:
+    """Arma la carta con los valores FINALES del operador. Con persistir=False es la
+    previsualización que se muestra en la revisión final (no consume numeración)."""
+    # Subtipo con confianza baja y no validado por el operador = orientativo: no va a la carta.
+    if (req.confianzas.get("suceso.subcategoria", 1.0) < 0.5
+            and "suceso.subcategoria" not in req.campos_validados
+            and req.valores_finales.get("suceso.subcategoria") == req.valores_sugeridos.get("suceso.subcategoria")):
+        req = req.model_copy(update={"valores_finales": {**req.valores_finales, "suceso.subcategoria": None}})
     now = datetime.now()
-    numero = db.next_carta_number(f"CL-{now:%Y%m%d}-")
+    numero = db.next_carta_number(f"CL-{now:%Y%m%d}-") if persistir else "BORRADOR"
     adv: list[str] = []
     if not _v(req, "ubicacion.calle"):
         adv.append("Falta la calle")
@@ -57,8 +47,11 @@ def derivar(req: CartaRequest) -> Carta:
         for k, v in req.valores_finales.items()
         if norm(v or "") != norm(req.valores_sugeridos.get(k) or "")
     ]
-    prioridad = _v(req, "prioridad")
-    direccion = componer_direccion(req)
+    relato = " ".join(t.text for t in req.turnos if t.speaker == "llamante")
+    similares = get_retriever().similares(relato, k=3, exclude=None) if relato.strip() else []
+    recursos = dispatch.recursos_sugeridos(req.valores_finales, similares, req.geo, relato)
+    nota = (req.nota_operativa or "").strip() or dispatch.nota_operativa(req.valores_finales, req.geo, req.alertas_criticas)
+    direccion = dispatch.componer_direccion(req.valores_finales)
     resumen = _v(req, "suceso.descripcion") or next((t.text for t in req.turnos if t.speaker == "llamante"), "")
     carta = Carta(
         numero=numero,
@@ -66,7 +59,7 @@ def derivar(req: CartaRequest) -> Carta:
         completa=not [a for a in adv if a != "Dirección no validada en el callejero"],
         advertencias=adv,
         origen=req.origen,
-        prioridad=prioridad,
+        prioridad=_v(req, "prioridad"),
         categoria=_v(req, "suceso.categoria"),
         subcategoria=_v(req, "suceso.subcategoria"),
         direccion=direccion,
@@ -76,21 +69,28 @@ def derivar(req: CartaRequest) -> Carta:
         barrio=_v(req, "ubicacion.barrio") or (req.geo.barrio if req.geo else None),
         comisaria_vecinal=req.geo.comisaria_vecinal if req.geo else None,
         resumen=resumen,
+        nota_operativa=nota,
+        recursos_detalle=recursos,
         personas="; ".join(x for x in (_v(req, "personas.cantidad"), _v(req, "personas.victimas"), _v(req, "personas.estado")) if x) or None,
         riesgos=_v(req, "riesgos"),
         preguntas_respondidas=respondidas,
         preguntas_pendientes=pendientes,
         instrucciones_transmitidas=req.instrucciones_transmitidas,
         alertas_criticas=req.alertas_criticas,
-        recursos_sugeridos=req.recursos_sugeridos,
+        recursos_sugeridos=[r.texto for r in recursos],
         notas_operador=req.notas_operador,
         correcciones_operador=len(correcciones),
         duracion_segundos=req.duracion_segundos,
         texto_plano="",
     )
     carta.texto_plano = texto_plano(carta)
-    db.save_carta(carta.model_dump(), correcciones, req.proveedor, req.caso_ref)
+    if persistir:
+        db.save_carta(carta.model_dump(), correcciones, req.proveedor, req.caso_ref)
     return carta
+
+
+def derivar(req: CartaRequest) -> Carta:
+    return armar(req, persistir=True)
 
 
 def texto_plano(c: Carta) -> str:
@@ -103,7 +103,7 @@ def texto_plano(c: Carta) -> str:
     ]
     if c.comisaria_vecinal:
         lines.append(f"Comisaría vecinal: {c.comisaria_vecinal}")
-    lines += [f"Resumen: {c.resumen}"]
+    lines += [f"NOTA OPERATIVA: {c.nota_operativa}"]
     if c.personas:
         lines.append(f"Personas: {c.personas}")
     if c.riesgos:
@@ -115,7 +115,8 @@ def texto_plano(c: Carta) -> str:
     if c.preguntas_pendientes:
         lines.append("Preguntas sin respuesta: " + " | ".join(c.preguntas_pendientes))
     if c.recursos_sugeridos:
-        lines.append("Recursos sugeridos (referencia para despacho): " + " | ".join(c.recursos_sugeridos))
+        lines.append("Recursos sugeridos (referencia, decide el despachador): " + " | ".join(
+            f"{r.texto} [{r.motivo}]" for r in c.recursos_detalle))
     if c.notas_operador:
         lines.append(f"Notas del operador: {c.notas_operador}")
     if c.advertencias:

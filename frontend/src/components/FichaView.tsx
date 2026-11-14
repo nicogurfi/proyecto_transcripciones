@@ -140,7 +140,6 @@ export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0, onSele
     if (scrollKey > 0 && activeStep >= 1 && activeStep <= 3) {
       refs[activeStep - 1]?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollKey]);
   const act = (n: number) => (activeStep === n ? "active" : "");
   // Click en el título de la sección = seleccionar ese paso del protocolo

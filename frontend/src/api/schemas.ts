@@ -80,6 +80,9 @@ export const CasoSimilar = z.object({
 });
 export type CasoSimilar = z.infer<typeof CasoSimilar>;
 
+export const RecursoSugerido = z.object({ texto: z.string(), fuente: z.string(), motivo: z.string() });
+export type RecursoSugerido = z.infer<typeof RecursoSugerido>;
+
 export const Inconsistencia = z.object({
   id: z.string(), tipo: z.string(), severidad: z.enum(["alta", "media", "baja"]),
   mensaje: z.string(), sugerencia: z.string().nullable(), evidencia: Evidence.nullable(),
@@ -101,6 +104,8 @@ export const Analisis = z.object({
   alertas_criticas: z.array(AlertaCritica),
   casos_similares: z.array(CasoSimilar),
   inconsistencias: z.array(Inconsistencia),
+  recursos_sugeridos: z.array(RecursoSugerido),
+  nota_operativa: z.string(),
   notas: z.array(z.string()),
 });
 export type Analisis = z.infer<typeof Analisis>;
@@ -130,6 +135,7 @@ export const Carta = z.object({
   categoria: z.string().nullable(), subcategoria: z.string().nullable(), direccion: z.string(),
   direccion_validada: z.boolean(), lat: z.number().nullable(), lon: z.number().nullable(),
   barrio: z.string().nullable(), comisaria_vecinal: z.string().nullable(), resumen: z.string(),
+  nota_operativa: z.string(), recursos_detalle: z.array(RecursoSugerido),
   personas: z.string().nullable(), riesgos: z.string().nullable(),
   preguntas_respondidas: z.array(z.string()), preguntas_pendientes: z.array(z.string()),
   instrucciones_transmitidas: z.array(z.string()), alertas_criticas: z.array(z.string()),

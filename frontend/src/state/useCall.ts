@@ -191,7 +191,6 @@ export function useCall() {
       cancel = true;
       window.clearTimeout(h);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressEdited, addressKey]);
 
   const geo: GeoValidacion | null = geoManual ?? analisis?.geo ?? null;
@@ -218,9 +217,10 @@ export function useCall() {
     return list.filter((i) => !dismissed.has(i.id));
   }, [analisis, dismissed, geoManual]);
 
-  const derivar = useCallback(
-    async (notas: string) => {
-      if (!analisis) return;
+  /** Cuerpo de la carta con los valores FINALES (se usa para previsualizar y para derivar). */
+  const cartaBody = useCallback(
+    (notas: string, notaOperativa: string | null) => {
+      if (!analisis) return null;
       const finales: Record<string, string | null> = {};
       const sugeridos: Record<string, string | null> = {};
       const confianzas: Record<string, number> = {};
@@ -230,7 +230,7 @@ export function useCall() {
         sugeridos[k] = c.value;
         confianzas[k] = c.confidence;
       }
-      const result = await api.derivar({
+      return {
         turnos: turns.filter((t) => t.text.trim()),
         valores_finales: finales,
         valores_sugeridos: sugeridos,
@@ -243,26 +243,40 @@ export function useCall() {
         })),
         instrucciones_transmitidas: analisis.instrucciones.filter((i) => instrMarks.has(i.id)).map((i) => i.texto),
         alertas_criticas: analisis.alertas_criticas.map((a) => a.texto),
-        recursos_sugeridos: analisis.casos_similares.slice(0, 1).map((c) => c.recursos),
         geo,
         notas_operador: notas || null,
+        nota_operativa: notaOperativa,
         origen: meta.origen,
         caso_ref: meta.casoId,
         timestamp_llamada: meta.timestamp,
         duracion_segundos: startedAt ? Math.round((Date.now() - startedAt) / 1000) : null,
         proveedor: analisis.proveedor,
-      });
+      };
+    },
+    [analisis, valor, turns, validated, checkMarks, instrMarks, meta, startedAt, geo],
+  );
+
+  const previsualizar = useCallback(async () => {
+    const body = cartaBody("", null);
+    return body ? api.previsualizar(body) : null;
+  }, [cartaBody]);
+
+  const derivar = useCallback(
+    async (notas: string, notaOperativa: string | null) => {
+      const body = cartaBody(notas, notaOperativa);
+      if (!body) return;
+      const result = await api.derivar(body);
       setCarta(result);
       stopLive();
       return result;
     },
-    [analisis, valor, turns, validated, checkMarks, instrMarks, meta, startedAt, stopLive, geo],
+    [cartaBody, stopLive],
   );
 
   return {
     meta, turns, analisis, analyzing, geo, geoManual, error, overrides, validated, checkMarks, instrMarks, startedAt, live, carta,
     pendientes, inconsistencias,
-    load, reset, addTurn, valor, setOverride, toggleValidated, toggleCheck, toggleInstr, dismiss, derivar, stopLive,
+    load, reset, addTurn, valor, setOverride, toggleValidated, toggleCheck, toggleInstr, dismiss, derivar, previsualizar, stopLive,
     setCarta,
   };
 }
