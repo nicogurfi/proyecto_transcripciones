@@ -328,3 +328,8 @@ summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-bottom: 
   .ubic-grid { grid-template-columns: 1fr; padding: 0 10px; }
   .cartas-view, .sim-grid, .load-grid { grid-template-columns: 1fr; }
 }
+
+.card-h.selectable { cursor: pointer; border-radius: var(--radius) var(--radius) 0 0; }
+.card-h.selectable:hover { background: var(--panel-2); color: var(--text); }
+.card-h.selectable:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.block.active > .card-h { color: var(--accent); }

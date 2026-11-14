@@ -73,7 +73,7 @@ Si el LLM falla, tarda más de `LLM_TIMEOUT_SECONDS` o devuelve JSON inválido, 
    | Tecla | Acción |
    |---|---|
    | `Alt+↑` / `Alt+↓` (o `RePág` / `AvPág`) | Paso anterior / siguiente |
-   | `Alt+Shift+1…6` o click en el paso | Ir directo a un paso (modo MANUAL) |
+   | `Alt+Shift+1…6`, click en el paso o en el título de la sección de la ficha (1–3) | Ir directo a un paso (modo MANUAL) |
    | `Alt+T` o click en el círculo | Tildar / destildar el paso actual |
    | `Alt+0` | Volver al modo automático |
 

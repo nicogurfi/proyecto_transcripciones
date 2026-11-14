@@ -9,6 +9,7 @@ interface Props {
   call: CallState;
   onHover: (ev: Evidence[]) => void;
   activeStep?: number;
+  onSelectStep?: (n: number) => void;
   scrollKey?: number;
 }
 
@@ -132,7 +133,7 @@ function FieldRow({ k, call, onHover, big }: { k: FieldKey; call: CallState; onH
   );
 }
 
-export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0 }: Props) {
+export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0, onSelectStep }: Props) {
   const refs = [useRef<HTMLElement>(null), useRef<HTMLElement>(null), useRef<HTMLElement>(null)];
   useEffect(() => {
     // solo al navegar a mano (scrollKey cambia): no mover la pantalla mientras llega el relato
@@ -142,6 +143,20 @@ export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0 }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollKey]);
   const act = (n: number) => (activeStep === n ? "active" : "");
+  // Click en el título de la sección = seleccionar ese paso del protocolo
+  const headerProps = (n: number) => ({
+    className: "card-h selectable",
+    role: "button",
+    tabIndex: 0,
+    title: `Ir al paso ${n} (Alt+Shift+${n})`,
+    onClick: () => onSelectStep?.(n),
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onSelectStep?.(n);
+      }
+    },
+  });
   const geo = call.geo;
   const geoLabel: Record<string, string> = {
     validada: "Dirección validada",
@@ -152,7 +167,7 @@ export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0 }: Prop
   return (
     <div className="ficha">
       <section ref={refs[0]} className={`card block ${act(1)}`}>
-        <header className="card-h">
+        <header {...headerProps(1)}>
           <span>1 · Ubicación</span>
           {geo && (
             <span className={`geo-badge ${geo.estado}`} title={geo.verificaciones.join("\n")}>
@@ -183,7 +198,7 @@ export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0 }: Prop
         )}
       </section>
       <section ref={refs[1]} className={`card block ${act(2)}`}>
-        <header className="card-h">
+        <header {...headerProps(2)}>
           <span>2 · Qué pasó</span>
         </header>
         <FieldRow k="prioridad" call={call} onHover={onHover} big />
@@ -192,7 +207,7 @@ export function FichaView({ call, onHover, activeStep = 0, scrollKey = 0 }: Prop
         <FieldRow k="suceso.descripcion" call={call} onHover={onHover} />
       </section>
       <section ref={refs[2]} className={`card block ${act(3)}`}>
-        <header className="card-h">
+        <header {...headerProps(3)}>
           <span>3 · Personas y riesgos</span>
         </header>
         <FieldRow k="personas.cantidad" call={call} onHover={onHover} />

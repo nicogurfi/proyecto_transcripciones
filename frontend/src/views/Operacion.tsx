@@ -218,7 +218,7 @@ export function Operacion({ call, showHelp }: Props) {
       <div className="workspace">
         <Transcript turns={call.turns} highlight={hover} live={call.live} onAddTurn={call.addTurn} inputRef={inputRef} />
         <div className="right">
-          <FichaView call={call} onHover={setHover} activeStep={selected} scrollKey={scrollKey} />
+          <FichaView call={call} onHover={setHover} activeStep={selected} scrollKey={scrollKey} onSelectStep={goTo} />
           {panel && <SidePanel panel={panel} call={call} onClose={() => setPanel(null)} onHover={setHover} />}
         </div>
       </div>
