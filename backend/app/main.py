@@ -173,9 +173,16 @@ def previsualizar_carta(req: CartaRequest) -> Carta:
     return carta_service.armar(req, persistir=False)
 
 
-@app.get("/api/cartas")
-def listar_cartas() -> list[dict[str, Any]]:
-    return db.list_cartas()
+@app.get("/api/cartas", response_model=list[Carta])
+def listar_cartas() -> list[Carta]:
+    """Normaliza cada carta con el contrato actual; una carta corrupta no rompe el listado."""
+    out: list[Carta] = []
+    for payload in db.list_cartas():
+        try:
+            out.append(Carta.model_validate(payload))
+        except ValueError:
+            log.warning("Carta %s con formato inválido: se omite del listado", payload.get("numero"))
+    return out
 
 
 @app.get("/api/correcciones")

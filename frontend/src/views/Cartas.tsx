@@ -7,9 +7,10 @@ export function Cartas() {
   const [cartas, setCartas] = useState<Carta[]>([]);
   const [corr, setCorr] = useState<{ campo: string; n: number; conf: number | null }[]>([]);
   const [sel, setSel] = useState<Carta | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api.cartas().then(setCartas).catch(() => undefined);
+    api.cartas().then(setCartas).catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
     api.correcciones().then(setCorr).catch(() => undefined);
   }, []);
 
@@ -17,7 +18,8 @@ export function Cartas() {
     <div className="cartas-view">
       <section className="card">
         <header className="card-h"><span>Cartas derivadas ({cartas.length})</span></header>
-        {cartas.length === 0 && <p className="muted pad">Todavía no se derivó ninguna carta.</p>}
+        {error && <p className="error pad">No se pudo cargar el historial: {error}</p>}
+        {!error && cartas.length === 0 && <p className="muted pad">Todavía no se derivó ninguna carta.</p>}
         <table className="cartas-table">
           <tbody>
             {cartas.map((c) => (

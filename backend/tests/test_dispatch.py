@@ -66,3 +66,23 @@ def test_subtipo_orientativo_no_va_a_la_carta():
         assert prev["subcategoria"] is None and "Convulsión" not in prev["nota_operativa"]
         validado = client.post("/api/cartas/previsualizar", json={**body, "campos_validados": ["suceso.subcategoria"]}).json()
         assert validado["subcategoria"] == "Convulsión en Restaurante"
+
+
+def test_cartas_viejas_sin_campos_nuevos_siguen_listandose():
+    import json as _json
+
+    from app import db
+
+    vieja = {"numero": "CL-20200101-0001", "creada": "2020-01-01T00:00:00", "estado": "DERIVADA", "completa": True,
+             "advertencias": [], "origen": "TELEFONIA_911", "prioridad": "P2", "categoria": None, "subcategoria": None,
+             "direccion": "Yerbal 2450", "direccion_validada": False, "lat": None, "lon": None, "barrio": None,
+             "comisaria_vecinal": None, "resumen": "x", "personas": None, "riesgos": None, "preguntas_respondidas": [],
+             "preguntas_pendientes": [], "instrucciones_transmitidas": [], "alertas_criticas": [], "recursos_sugeridos": [],
+             "notas_operador": None, "correcciones_operador": 0, "duracion_segundos": None, "texto_plano": "x"}
+    with db.connect() as c:
+        c.execute("INSERT OR REPLACE INTO cartas(numero, creada, prioridad, categoria, direccion, payload) VALUES (?,?,?,?,?,?)",
+                  (vieja["numero"], vieja["creada"], "P2", None, vieja["direccion"], _json.dumps(vieja)))
+    with TestClient(app) as client:
+        cartas = client.get("/api/cartas").json()
+    v = next(c for c in cartas if c["numero"] == "CL-20200101-0001")
+    assert v["nota_operativa"] == "" and v["recursos_detalle"] == []

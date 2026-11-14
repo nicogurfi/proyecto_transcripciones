@@ -243,8 +243,9 @@ class Carta(StrictModel):
     barrio: str | None
     comisaria_vecinal: str | None
     resumen: str
-    nota_operativa: str
-    recursos_detalle: list[RecursoSugerido]
+    # con default: las cartas guardadas antes de agregar estos campos siguen siendo válidas
+    nota_operativa: str = ""
+    recursos_detalle: list[RecursoSugerido] = Field(default_factory=list)
     personas: str | None
     riesgos: str | None
     preguntas_respondidas: list[str]

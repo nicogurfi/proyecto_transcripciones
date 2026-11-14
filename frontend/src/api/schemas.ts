@@ -135,7 +135,7 @@ export const Carta = z.object({
   categoria: z.string().nullable(), subcategoria: z.string().nullable(), direccion: z.string(),
   direccion_validada: z.boolean(), lat: z.number().nullable(), lon: z.number().nullable(),
   barrio: z.string().nullable(), comisaria_vecinal: z.string().nullable(), resumen: z.string(),
-  nota_operativa: z.string(), recursos_detalle: z.array(RecursoSugerido),
+  nota_operativa: z.string().default(""), recursos_detalle: z.array(RecursoSugerido).default([]),
   personas: z.string().nullable(), riesgos: z.string().nullable(),
   preguntas_respondidas: z.array(z.string()), preguntas_pendientes: z.array(z.string()),
   instrucciones_transmitidas: z.array(z.string()), alertas_criticas: z.array(z.string()),

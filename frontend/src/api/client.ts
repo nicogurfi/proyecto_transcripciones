@@ -6,7 +6,9 @@ import {
 
 export class ApiError extends Error {}
 
-async function getJson<T>(url: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
+// Se tipa con el resultado del parseo (z.output), no con la entrada: los campos con
+// .default() son opcionales al llegar pero siempre están presentes después de validar.
+async function getJson<S extends z.ZodTypeAny>(url: string, schema: S, init?: RequestInit): Promise<z.output<S>> {
   const r = await fetch(url, init);
   if (!r.ok) {
     const detail = await r.text();
