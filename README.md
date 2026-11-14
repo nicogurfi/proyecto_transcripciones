@@ -77,7 +77,7 @@ Si el LLM falla, tarda más de `LLM_TIMEOUT_SECONDS` o devuelve JSON inválido, 
    | `Alt+T` o click en el círculo | Tildar / destildar el paso actual |
    | `Alt+0` | Volver al modo automático |
 
-   Ir al paso 4 abre las preguntas (F1) y el paso 5 las instrucciones (F2); los pasos 1–3 resaltan la sección de la ficha.
+   Cambiar de paso nunca abre paneles: los pasos 1–3 resaltan su sección de la ficha y los pasos 4–6 solo indican el atajo (F1 preguntas, F2 instrucciones, Ctrl+Enter carta).
    Los pasos reaccionan tanto a la transcripción como a las correcciones manuales. Si el operador corrige la dirección, se revalida contra el callejero y USIG, y se actualizan el mapa, el paso 1 y las inconsistencias.
 6. **`Ctrl+Enter`** abre la revisión final y vuelve a apretarse para **derivar la carta**.
 7. Pestañas **Simulacro** (entrenamiento sin copiloto) y **Cartas** (historial y correcciones registradas).

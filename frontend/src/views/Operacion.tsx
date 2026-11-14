@@ -88,8 +88,7 @@ export function Operacion({ call, showHelp }: Props) {
     const step = Math.min(6, Math.max(1, n));
     setManualStep(step);
     setScrollKey((k) => k + 1);
-    // Ir a un paso es pedir su ayuda: 4 abre el interrogatorio, 5 las instrucciones.
-    setPanel(step === 4 ? "preguntas" : step === 5 ? "instrucciones" : null);
+    // Cambiar de paso nunca abre paneles: las sugerencias solo aparecen con su atajo (F1–F4).
   }, []);
 
   const toggleTick = useCallback(
@@ -107,7 +106,6 @@ export function Operacion({ call, showHelp }: Props) {
 
   const backToAuto = useCallback(() => {
     setManualStep(null);
-    setPanel(null);
   }, []);
 
   useEffect(() => {

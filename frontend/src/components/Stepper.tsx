@@ -57,6 +57,9 @@ export function Stepper({ pasos, manualTicks, selected, auto, onSelect, onToggle
           {actual.faltantes.length > 0 && actual.estado !== "completo" && (
             <span className="falta"> · Falta: {actual.faltantes.slice(0, 3).join(" · ")}</span>
           )}
+          {actual.numero === 4 && <span className="muted"> · <kbd>F1</kbd> ver preguntas</span>}
+          {actual.numero === 5 && <span className="muted"> · <kbd>F2</kbd> ver instrucciones</span>}
+          {actual.numero === 6 && <span className="muted"> · <kbd>Ctrl+Enter</kbd> revisar y derivar</span>}
           <span className="step-keys">
             <kbd>Alt+↑↓</kbd> moverse · <kbd>Alt+T</kbd> tildar
             {!auto && (
