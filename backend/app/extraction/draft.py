@@ -58,4 +58,8 @@ class Draft:
     similares: list[Similar] = field(default_factory=list)
     senales_p1: list[tuple[str, int, int]] = field(default_factory=list)
     dudas: list[tuple[str, int, int]] = field(default_factory=list)  # hedges / autocorrecciones
+    # Evolución durante la llamada: (campo, antes, ahora, start, end) del dato más reciente
+    cambios: list[tuple[str, str, str, int, int]] = field(default_factory=list)
+    # Señales de riesgo de vida que parecen resolverse más adelante: (señal, evidencia, start, end)
+    senales_resueltas: list[tuple[str, str, int, int]] = field(default_factory=list)
     notas: list[str] = field(default_factory=list)

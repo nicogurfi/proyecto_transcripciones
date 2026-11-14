@@ -13,6 +13,7 @@ El operador **no despacha**: contiene al llamante, extrae y valida datos, transm
 - **Ubicación primero.** Los pasos siguen el orden estándar de 911: Ubicación → Qué pasó → Personas y riesgos → Interrogatorio → Pre-arribo → Carta. Si la llamada se corta, al menos se sabe dónde es.
 - **P4 no existe en el dataset** (solo P1–P3). Lo definí como "No urgente / informativo" (reclamos, hechos de hace días).
 - **P1 exige evidencia explícita** de riesgo de vida: atrapados, sin respuesta, compromiso respiratorio, fuego activo, gas, etc. Si los casos parecidos sugieren P1 pero el relato no tiene ninguna señal, propongo P2 con confianza baja y lo marco como inconsistencia para verificar. Ante discrepancia entre reglas y LLM, **se toma la prioridad más grave**.
+- **La llamada evoluciona.** Para datos que cambian (estado de las personas, atrapamiento), el valor actual es **el último dicho** y el anterior queda como historial: "está bien (antes: se desmayó)". El cambio se informa en F4 para confirmarlo. Si una señal de riesgo de vida parece resolverse ("ya reaccionó", "ya salió"), **la prioridad no baja sola**: se mantiene la más grave, baja la confianza y se pide al operador que evalúe. Bajar un P1 por una frase mal interpretada es el error más caro.
 - **Recursos de despacho**: se muestran solo como referencia, y aclarando que la decisión es del despachador CAD.
 - **El número de rellamada** no está en las transcripciones. Queda como pregunta base del checklist (en un sistema real lo aporta el ANI).
 

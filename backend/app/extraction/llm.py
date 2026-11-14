@@ -134,6 +134,7 @@ Reglas estrictas:
 - Calles: nombre tal como existe en CABA (ej. "Av. Corrientes"). La intersección va en "interseccion" (solo si se dijo "X y Z" o "casi Z"), las calles laterales en "entre_calles".
 - categoria: una de {", ".join(CATEGORIAS)}.
 - prioridad: {"; ".join(f"{k} = {v}" for k, v in DESCRIPCION_PRIORIDAD.items())}. Ante la duda entre dos, elegí la más grave y justificá.
+- La llamada evoluciona: si un dato cambia (p. ej. "se desmayó" y luego "ya está bien"), informá el MÁS RECIENTE y agregá el anterior entre paréntesis: "está bien (antes: se desmayó)". Nunca bajes la prioridad por una mejoría: mantené la más grave y mencioná la mejoría en la justificación.
 - posibles_inconsistencias: datos que podrían estar mal transcriptos o ser contradictorios (con evidencia).
 - preguntas_respondidas: ids de las preguntas del checklist que YA tienen respuesta en el relato, con la evidencia.
 Respondé ÚNICAMENTE con un objeto JSON válido, sin texto adicional."""

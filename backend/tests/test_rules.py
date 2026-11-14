@@ -45,3 +45,25 @@ def test_calle_correcta_en_la_mayoria_del_dataset():
         if calle and (gt.split()[0] in calle.value.lower() or calle.value.lower().split()[-1] in gt):
             ok += 1
     assert ok / len(casos) >= 0.9
+
+
+def test_estado_se_actualiza_con_el_ultimo_turno():
+    d = draft_for(
+        "Llamante: Hay olor a gas en Av. Boedo 950 y una vecina se desmayó en el pasillo. "
+        "Operador: ¿Cómo está la vecina? Llamante: Ya está bien, se recuperó."
+    )
+    estado = d.campos["personas.estado"].value
+    assert estado.startswith("ya está bien") and "(antes: se desmayó)" in estado
+    assert d.cambios and d.cambios[0][0] == "personas.estado"
+
+
+def test_mejoria_no_baja_la_prioridad_sola():
+    d = draft_for("Llamante: Mi papá no responde, está tirado. Operador: ¿Y ahora? Llamante: Ya reaccionó, está hablando.")
+    assert d.campos["prioridad"].value == "P1"
+    assert "verificar" in d.campos["prioridad"].method
+    assert d.senales_resueltas
+
+
+def test_atrapado_que_sale():
+    d = draft_for("Llamante: Hay humo y adentro quedó el cocinero. Operador: ¿Sigue adentro? Llamante: No, ya salió, lo sacaron los vecinos.")
+    assert d.campos["personas.atrapados"].value.startswith("No")

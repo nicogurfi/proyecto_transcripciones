@@ -108,6 +108,14 @@ def detectar(
             add("incertidumbre", "baja", f"Dato con alternativas: '{texto}'.", "Precisar cuál de las dos opciones es.", doc.evidence(s, e))
         else:
             add("incertidumbre", "baja", f"Dato incierto: '{texto}'.", None, doc.evidence(s, e))
+    # 8b. Datos que cambiaron durante la llamada
+    nombres = {"personas.estado": "El estado de la persona", "personas.atrapados": "La situación de atrapamiento"}
+    for campo, antes, ahora, s, e in draft.cambios:
+        add("evolucion", "baja", f"{nombres.get(campo, campo)} cambió durante la llamada: '{antes}' → '{ahora}'.",
+            "Confirmar el estado actual con el llamante.", doc.evidence(s, e))
+    for label, texto, s, e in draft.senales_resueltas:
+        add("evolucion", "media", f"La señal de riesgo '{label}' parece resolverse más adelante ('{texto}').",
+            "La prioridad no se baja automáticamente: evaluar con el llamante si corresponde.", doc.evidence(s, e))
     # 9. Tipología ambigua
     ranked = sorted(draft.categoria_scores.items(), key=lambda kv: -kv[1])
     if len(ranked) > 1 and ranked[0][1] > 0 and ranked[0][1] - ranked[1][1] < 0.12:

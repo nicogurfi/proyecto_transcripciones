@@ -50,6 +50,15 @@ SENALES_P1: tuple[tuple[str, str], ...] = (
     (r"choque en cadena|cruzado en el carril r[áa]pido", "colisión múltiple en vía rápida"),
 )
 
+# Frases que indican que una situación de riesgo mejoró o se resolvió más adelante en la llamada.
+SALIDA_RE = r"ya (?:sali[óo]|salieron|lo sacaron|la sacaron|los sacaron|est[áa]n? afuera)|lograron salir|no (?:qued[óo]|hay) nadie adentro|nadie qued[óo] adentro"
+RESOLUCION: dict[str, str] = {
+    "inconsciencia / sin respuesta": r"reaccion[óo]|se despert[óo]|(?:ya )?est[áa] (?:bien|consciente|hablando)|me contest[óo]|recuper[óo] la conciencia",
+    "compromiso respiratorio": r"ya respira|respira bien|le entra el aire|(?:ya )?est[áa] bien",
+    "persona atrapada": SALIDA_RE,
+    "convulsión activa": r"(?:ya )?(?:dej[óo] de convulsionar|se le pas[óo]|par[óo] de temblar)",
+}
+
 P4_SENALES = r"hace (?:varios )?d[íi]as|hace una semana|quer[íi]a (?:avisar|informar|reclamar)|no es urgente|reclamo"
 
 RIESGOS_LEXICO: tuple[tuple[str, str], ...] = (
@@ -71,6 +80,9 @@ RIESGOS_LEXICO: tuple[tuple[str, str], ...] = (
 )
 
 ESTADO_LEXICO: tuple[str, ...] = (
+    # estados de mejoría (van primero: "ya está bien" no debe partirse)
+    r"(?:ya )?est[áa] bien", r"se recuper[óo]", r"reaccion[óo]", r"se despert[óo]", r"est[áa] hablando",
+    r"no est[áa] herid[oa]", r"no hay herid[oa]s", r"nadie (?:est[áa] )?herid[oa]", r"ya respira",
     r"est[áa] consciente", r"recuper[óo] la conciencia", r"no responde", r"no se mueve", r"inconsciente",
     r"no respira", r"respira(?: pero)? (?:bien|normal|raro|con dificultad|mal)", r"roncando", r"no (?:me |nos )?contesta\b(?! el timbre)", r"tirad[oa] en el piso", r"sangrando(?: bastante| mucho)?", r"convulsionando", r"se desmay[óo]",
     r"llora de dolor", r"gritando de dolor", r"no se puede incorporar", r"no puede mover la pierna \w+",
@@ -324,6 +336,16 @@ def prioritize(doc: Document, draft: Draft) -> None:
             if m:
                 draft.senales_p1.append((label, base + m.start(), base + m.end()))
                 break
+    # ¿Alguna señal parece resolverse más adelante? Se informa, pero la prioridad NO baja sola.
+    for label, _s, e in draft.senales_p1:
+        patron = RESOLUCION.get(label)
+        if not patron:
+            continue
+        for mm in re.finditer(patron, doc.text[e:], re.I):
+            pos = e + mm.start()
+            if doc.is_caller(pos):
+                draft.senales_resueltas.append((label, mm.group(0), pos, e + mm.end()))
+                break
     cat = draft.campos.get("suceso.categoria")
     ref = [s for s in draft.similares if cat is None or s.caso.categoria == cat.value]
     votes: dict[str, float] = defaultdict(float)
@@ -337,6 +359,11 @@ def prioritize(doc: Document, draft: Draft) -> None:
         p = "P1"
         method = "señales de riesgo de vida: " + ", ".join(senales)
         conf = min(0.95, 0.7 + 0.08 * len(senales))
+        resueltas = {r[0] for r in draft.senales_resueltas}
+        if resueltas and resueltas >= set(senales):
+            # todas las señales parecen resueltas: se mantiene P1 (nunca se baja solo) pero se pide verificar
+            method += " (parecen resueltas más adelante: verificar si corresponde bajar)"
+            conf = 0.5
     elif re.search(P4_SENALES, caller, re.I):
         p = "P4"
         method = "sin riesgo actual (reclamo / informativo)"
@@ -397,10 +424,29 @@ def extract_personas(doc: Document, draft: Draft) -> None:
         )
     if estados:
         estados.sort(key=lambda x: x[1])
+        ultimo_turno = max(doc.turn_of(s) for _, s, _ in estados)
+        actuales = [x for x in estados if doc.turn_of(x[1]) == ultimo_turno]
+        previos = [x for x in estados if doc.turn_of(x[1]) != ultimo_turno]
+        valor = "; ".join(x[0] for x in actuales[:4])
+        metodo = "estado relatado"
+        if previos:
+            antes = "; ".join(x[0] for x in previos[-3:])
+            valor = f"{valor} (antes: {antes})"
+            metodo = f"estado actualizado en el turno {ultimo_turno + 1}"
+            draft.cambios.append(("personas.estado", antes, "; ".join(x[0] for x in actuales[:4]), actuales[0][1], actuales[-1][2]))
         draft.campos["personas.estado"] = Hallazgo(
-            "; ".join(e[0] for e in estados[:5]), [(e[1], e[2]) for e in estados[:5]], "estado relatado", 0.8
+            valor, [(x[1], x[2]) for x in actuales[:4]] + [(x[1], x[2]) for x in previos[-3:]], metodo, 0.8
         )
-    if atrapados:
+    salidas: list[tuple[int, int]] = []
+    for text, base in _caller_spans(doc):
+        for mm in re.finditer(SALIDA_RE, text, re.I):
+            salidas.append((base + mm.start(), base + mm.end()))
+    if salidas and (not atrapados or salidas[-1][0] > atrapados[-1][0]):
+        valor = "No (ya salió)" + (" (antes: Sí)" if atrapados else "")
+        draft.campos["personas.atrapados"] = Hallazgo(valor, [salidas[-1], *atrapados[:1]], "actualizado durante la llamada" if atrapados else "relato", 0.8)
+        if atrapados:
+            draft.cambios.append(("personas.atrapados", "Sí", "No", *salidas[-1]))
+    elif atrapados:
         draft.campos["personas.atrapados"] = Hallazgo("Sí", atrapados[:2], "mención de atrapamiento", 0.85)
 
     for text, base in _caller_spans(doc):
