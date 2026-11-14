@@ -26,7 +26,7 @@ class ReglaCritica:
 
 
 REGLAS: tuple[ReglaCritica, ...] = (
-    ReglaCritica("casco", (r"\bmoto|motociclista|delivery", r"casco"),
+    ReglaCritica("casco", (r"\bmotos?\b|motociclista|motoquero|delivery", r"casco"),
                  "NO retirar el casco del motociclista ni moverlo.", "Posible lesión cervical"),
     ReglaCritica("litio", (r"litio|bater[íi]a", r"fuego|explot|llama|humo"),
                  "NO usar agua: fuego de baterías de litio. Evacuar y cerrar el local.", "Reacción violenta del litio con agua"),
@@ -62,7 +62,13 @@ def alertas_criticas(doc: Document) -> list[AlertaCritica]:
                 m = re.search(regla.requiere[0], t.text, re.I)
                 if m:
                     base = doc.bases[i]
-                    ev = doc.evidence(base + m.start(), base + m.end())
+                    # la cita abarca la palabra completa ("motociclista", no "moto")
+                    s, e = m.start(), m.end()
+                    while s > 0 and t.text[s - 1].isalnum():
+                        s -= 1
+                    while e < len(t.text) and t.text[e].isalnum():
+                        e += 1
+                    ev = doc.evidence(base + s, base + e)
                     break
             out.append(AlertaCritica(id=regla.id, texto=regla.texto, motivo=regla.motivo, evidencia=ev))
     return out[:3]  # más de 3 alertas fijas dejaría de ser una alerta

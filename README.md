@@ -66,6 +66,7 @@ Si el LLM falla, tarda más de `LLM_TIMEOUT_SECONDS` o devuelve JSON inválido, 
    | `F2` / `Alt+2` | Instrucciones de pre-arribo para leer al llamante |
    | `F3` / `Alt+3` | Casos similares y recursos (referencia para el despachador) |
    | `F4` / `Alt+4` | Posibles inconsistencias (errores del llamante o de la transcripción) |
+   | `Alt+5` / `Alt+A` | Alertas críticas de seguridad (barra roja). Son reglas por palabras clave con margen de error: solo se ve su contador en rojo hasta que se piden |
 
 5. **Protocolo por pasos.** Por defecto el copiloto se para en el primer paso sin tildar (modo AUTO), pero el operador se mueve libremente:
 

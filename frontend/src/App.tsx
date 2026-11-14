@@ -14,6 +14,7 @@ const SHORTCUTS: [string, string][] = [
   ["F2 / Alt+2", "Instrucciones de pre-arribo para leer al llamante"],
   ["F3 / Alt+3", "Casos similares y recursos (referencia para despacho)"],
   ["F4 / Alt+4", "Posibles inconsistencias en el relato o la transcripción"],
+  ["Alt+5 / Alt+A", "Alertas críticas de seguridad (barra roja)"],
   ["1 – 9", "Con un panel abierto: marcar ítem como hecho"],
   ["Alt+↑ / Alt+↓", "Paso anterior / siguiente del protocolo (también RePág / AvPág)"],
   ["Alt+Shift+1…6", "Ir directo a un paso"],
@@ -100,8 +101,8 @@ export function App() {
               </tbody>
             </table>
             <p className="muted">
-              Las sugerencias solo aparecen cuando las pedís. Lo único que se muestra sin pedirlo son las alertas críticas de
-              seguridad (barra roja).
+              Ninguna sugerencia aparece sin pedirla. Las alertas críticas de seguridad son reglas con margen de error:
+              solo se ve su contador en rojo y se despliegan con Alt+5.
             </p>
           </div>
         </div>

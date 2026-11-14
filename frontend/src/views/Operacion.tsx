@@ -41,6 +41,8 @@ export function Operacion({ call, showHelp }: Props) {
   const [hover, setHover] = useState<Evidence[]>([]);
   const [loadOpen, setLoadOpen] = useState(false);
   const [cartaOpen, setCartaOpen] = useState(false);
+  // Alertas críticas: son reglas con margen de error, se despliegan a pedido (Alt+5 / Alt+A)
+  const [alertsOpen, setAlertsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const a = call.analisis;
   // Paso elegido a mano (null = automático: el primer paso sin tildar)
@@ -53,6 +55,7 @@ export function Operacion({ call, showHelp }: Props) {
   useEffect(() => {
     setManualStep(null);
     setManualTicks({});
+    setAlertsOpen(false);
   }, [call.startedAt]);
 
   const pasoOverrides: Record<number, EstadoPaso> = {};
@@ -155,6 +158,11 @@ export function Operacion({ call, showHelp }: Props) {
         if (a) setCartaOpen(true);
         return;
       }
+      if (e.altKey && !e.shiftKey && (e.code === "Digit5" || e.code === "KeyA")) {
+        e.preventDefault();
+        setAlertsOpen((o) => !o);
+        return;
+      }
       if (e.altKey && e.code === "KeyL") {
         e.preventDefault();
         setLoadOpen(true);
@@ -190,13 +198,21 @@ export function Operacion({ call, showHelp }: Props) {
         onToggleTick={toggleTick}
         onAuto={backToAuto}
       />
-      {a && a.alertas_criticas.length > 0 && (
+      {alertsOpen && a && (
         <div className="critical-bar" role="alert">
+          {a.alertas_criticas.length === 0 && <span className="none">Sin alertas críticas para este relato.</span>}
           {a.alertas_criticas.map((al) => (
-            <span key={al.id} title={al.motivo} onMouseEnter={() => al.evidencia && setHover([al.evidencia])} onMouseLeave={() => setHover([])}>
+            <span
+              key={al.id}
+              title={`${al.motivo}${al.evidencia ? ` · disparada por: "${al.evidencia.text}"` : ""}`}
+              onMouseEnter={() => al.evidencia && setHover([al.evidencia])}
+              onMouseLeave={() => setHover([])}
+            >
               ⚠ {al.texto}
+              {al.evidencia && <q> “{al.evidencia.text}”</q>}
             </span>
           ))}
+          <small className="disclaimer">Regla automática por palabras clave: puede dispararse de más (p. ej. con negaciones). Confirmar con el llamante.</small>
         </div>
       )}
       <div className="workspace">
@@ -219,6 +235,14 @@ export function Operacion({ call, showHelp }: Props) {
               <kbd>{p.key}</kbd> {p.short} <b>{counts[p.id]}</b>
             </button>
           ))}
+          <button
+            type="button"
+            className={`chip ${alertsOpen ? "on" : ""} ${a && a.alertas_criticas.length > 0 ? "alert" : ""}`}
+            onClick={() => setAlertsOpen((o) => !o)}
+            title="Alertas críticas de seguridad (Alt+5 / Alt+A)"
+          >
+            <kbd>Alt+5</kbd> Alertas <b>{a?.alertas_criticas.length ?? 0}</b>
+          </button>
           <button type="button" className="chip" onClick={() => setLoadOpen(true)} title="Cargar caso (Alt+L)">
             <kbd>Alt+L</kbd> Cargar
           </button>

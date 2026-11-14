@@ -5,7 +5,7 @@
 El operador **no despacha**: contiene al llamante, extrae y valida datos, transmite instrucciones y deriva una carta. Por eso el copiloto no "resuelve" el caso. Su trabajo es:
 
 1. **Estructurar lo dicho**, mostrando también lo que *falta*. El campo vacío es información: le dice al operador qué preguntar.
-2. **No sobreestimular.** Las sugerencias (preguntas, instrucciones, casos similares, inconsistencias) se piden con una tecla. La única excepción es la **barra roja de contraindicaciones críticas** ("NO retirar el casco", "NO usar agua: litio"): si el operador no aprieta F2 en ese momento, un error puede costar una vida.
+2. **No sobreestimular.** Ninguna sugerencia aparece sin pedirla. Las contraindicaciones críticas ("NO retirar el casco", "NO usar agua: litio") salen de reglas por palabras clave con margen de error: pueden dispararse de más, por ejemplo con negaciones como "no tenía casco". Por eso no se imponen en pantalla. Se ve solo un contador en rojo y la barra se despliega con `Alt+5`, mostrando la palabra que la disparó y un aviso para confirmar con el llamante. *Trade-off:* el operador tiene que pedirla, pero el contador rojo hace difícil ignorarla.
 3. **Cada segundo cuenta.** El análisis llega en dos fases por streaming. Las reglas responden en unos 35 ms y el LLM refina después, así que el operador nunca espera al modelo.
 
 ## 2. Supuestos
